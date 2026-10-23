@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>دفتر جهاتي | جهات الاتصال</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172b4d;
+      --muted: #73819a;
+      --line: #e7edf4;
+      --brand: #5267dc;
+      --brand-dark: #4054c6;
+      --brand-soft: #eef0ff;
+      --surface: #fff;
+      --background: #f4f7fb;
+      --danger: #d84c5b;
+      --success: #18835f;
+      --shadow: 0 18px 55px rgb(34 55 92 / 8%);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 10% 5%, rgb(221 228 255 / 70%), transparent 34rem),
+        var(--background);
+      font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .page-shell {
+      width: min(1100px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 44px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border-radius: 16px;
+      color: #fff;
+      background: linear-gradient(145deg, #7384f2, #4f61d4);
+      box-shadow: 0 8px 18px rgb(82 103 220 / 24%);
+    }
+
+    .brand-mark svg { width: 25px; height: 25px; }
+    .brand-name { margin: 0; font-size: 17px; font-weight: 800; }
+    .brand-caption { margin: 1px 0 0; color: var(--muted); font-size: 12px; }
+
+    .privacy-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      border: 1px solid #e5ebf3;
+      border-radius: 999px;
+      color: #60718b;
+      background: rgb(255 255 255 / 76%);
+      font-size: 12px;
+    }
+
+    .privacy-note svg { width: 15px; height: 15px; color: #5f7d6d; }
+
+    .intro { margin: 0 0 22px; }
+    .intro h1 { margin: 0; font-size: clamp(26px, 4vw, 34px); letter-spacing: -.5px; }
+    .intro p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(285px, .85fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid rgb(230 236 245 / 90%);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .contacts-panel { min-height: 480px; padding: 25px; }
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 21px;
+    }
+
+    .panel-heading h2, .form-heading h2 { margin: 0; font-size: 18px; }
+    .count-badge {
+      display: inline-flex;
+      min-width: 34px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: var(--brand-dark);
+      background: var(--brand-soft);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .search-wrap { position: relative; margin-bottom: 20px; }
+    .search-wrap svg {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      width: 18px;
+      height: 18px;
+      color: #8b98ad;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 45px 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      outline: none;
+      color: var(--ink);
+      background: #fbfcfe;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .search-input::placeholder, .field-input::placeholder { color: #a2adbd; }
+    .search-input:focus, .field-input:focus {
+      border-color: #9ba7f4;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgb(82 103 220 / 10%);
+    }
+
+    .contact-list { display: grid; gap: 11px; }
+    .contact-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      padding: 15px 16px;
+      border: 1px solid #edf0f5;
+      border-radius: 15px;
+      background: #fff;
+      animation: card-in .28s ease both;
+      transition: border-color .2s, box-shadow .2s, opacity .2s, transform .2s;
+    }
+
+    .contact-card:hover {
+      border-color: #dbe1fc;
+      box-shadow: 0 6px 20px rgb(38 55 91 / 6%);
+    }
+
+    .contact-card.is-removing {
+      opacity: 0;
+      transform: translateX(14px) scale(.98);
+    }
+
+    .avatar {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      place-items: center;
+      border-radius: 16px;
+      color: #fff;
+      background: linear-gradient(145deg, #8997f4, #6172df);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .contact-info { flex: 1; min-width: 0; }
+    .contact-name {
+      overflow: hidden;
+      margin: 0 0 4px;
+      font-size: 15px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .contact-detail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .detail-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .detail-item span:last-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      direction: ltr;
+    }
+
+    .detail-item svg { width: 13px; height: 13px; flex: 0 0 13px; color: #9aa6b8; }
+
+    .delete-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border: 0;
+      border-radius: 10px;
+      color: #bf4a57;
+      background: #fff3f4;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .2s, transform .2s;
+    }
+
+    .delete-button:hover { background: #ffe6e8; transform: translateY(-1px); }
+    .delete-button svg { width: 15px; height: 15px; }
+
+    .empty-state {
+      display: flex;
+      min-height: 260px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 12px;
+      text-align: center;
+      animation: fade-in .3s ease both;
+    }
+
+    .empty-illustration {
+      display: grid;
+      width: 82px;
+      height: 82px;
+      margin-bottom: 16px;
+      place-items: center;
+      border-radius: 27px;
+      color: #6173df;
+      background: #f0f2ff;
+    }
+
+    .empty-illustration svg { width: 38px; height: 38px; }
+    .empty-state h3 { margin: 0; font-size: 16px; }
+    .empty-state p { max-width: 280px; margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+
+    .form-panel { padding: 24px; }
+    .form-heading { margin-bottom: 20px; }
+    .form-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .form-field { margin-bottom: 16px; }
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 7px;
+      color: #344563;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .required { color: var(--danger); }
+    .optional { color: #9aa6b8; font-size: 11px; font-weight: 400; }
+
+    .field-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      outline: none;
+      color: var(--ink);
+      background: #fbfcfe;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .field-input[dir="ltr"] { text-align: left; }
+    .field-input[aria-invalid="true"] { border-color: #e18a93; }
+    .field-error { min-height: 18px; margin: 4px 1px 0; color: var(--danger); font-size: 11px; }
+
+    .submit-button {
+      display: flex;
+      width: 100%;
+      min-height: 47px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 6px;
+      border: 0;
+      border-radius: 12px;
+      color: #fff;
+      background: linear-gradient(135deg, #6678e9, #4d60d3);
+      box-shadow: 0 8px 16px rgb(82 103 220 / 20%);
+      font-weight: 700;
+      transition: filter .2s, transform .2s, box-shadow .2s;
+    }
+
+    .submit-button:hover {
+      box-shadow: 0 10px 20px rgb(82 103 220 / 27%);
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+    }
+
+    .submit-button:active { transform: translateY(0); }
+    .submit-button svg { width: 18px; height: 18px; }
+
+    .form-hint {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 17px;
+      padding: 11px;
+      border-radius: 11px;
+      color: #63728a;
+      background: #f6f8fc;
+      font-size: 11px;
+    }
+
+    .form-hint svg { width: 15px; height: 15px; flex: 0 0 15px; color: #7384e6; }
+
+    .toast {
+      position: fixed;
+      z-index: 5;
+      right: 50%;
+      bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      max-width: min(440px, calc(100% - 32px));
+      padding: 12px 17px;
+      border: 1px solid #d8eee4;
+      border-radius: 13px;
+      color: #176c50;
+      background: #f2fbf6;
+      box-shadow: 0 10px 32px rgb(23 58 44 / 13%);
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(50%, 12px);
+      transition: opacity .2s, transform .2s;
+    }
+
+    .toast.is-visible { opacity: 1; transform: translate(50%, 0); }
+    .toast.is-error { border-color: #f2d7da; color: #a13a46; background: #fff6f6; }
+    .toast svg { width: 17px; height: 17px; flex: 0 0 17px; }
+
+    .footer-note { margin: 22px 0 0; color: #98a3b4; text-align: center; font-size: 11px; }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell { width: min(100% - 28px, 600px); padding-top: 25px; }
+      .workspace { grid-template-columns: 1fr; }
+      .form-panel { grid-row: 1; }
+      .contacts-panel { min-height: 360px; }
+      .intro { margin-bottom: 17px; }
+    }
+
+    @media (max-width: 480px) {
+      .page-shell { width: calc(100% - 24px); padding: 18px 0 30px; }
+      .topbar { margin-bottom: 22px; }
+      .privacy-note { gap: 5px; padding: 7px 9px; font-size: 10px; }
+      .brand-mark { width: 42px; height: 42px; border-radius: 14px; }
+      .brand-name { font-size: 15px; }
+      .contacts-panel, .form-panel { padding: 18px; border-radius: 18px; }
+      .contact-card { gap: 10px; padding: 12px; }
+      .avatar { width: 42px; height: 42px; flex-basis: 42px; border-radius: 14px; }
+      .contact-detail { gap: 3px 10px; }
+      .delete-button { gap: 4px; padding: 7px 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="10" cy="7" r="4"/>
+            <path d="M20 8v6M23 11h-6"/>
+          </svg>
+        </div>
+        <div>
+          <p class="brand-name">دفتر جهاتي</p>
+          <p class="brand-caption">كل الأشخاص المهمين في مكان واحد</p>
+        </div>
+      </div>
+      <div class="privacy-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="10" width="16" height="11" rx="2"/>
+          <path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/>
+        </svg>
+        <span>بياناتك محفوظة على جهازك</span>
+      </div>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <h1 id="page-title">جهات الاتصال</h1>
+      <p>أضف جهاتك المهمة وابقَ على تواصل دائمًا.</p>
+    </section>
+
+    <div class="workspace">
+      <section class="panel contacts-panel" aria-labelledby="contacts-heading">
+        <div class="panel-heading">
+          <h2 id="contacts-heading">كل جهات الاتصال</h2>
+          <span class="count-badge" id="contact-count" aria-live="polite">0</span>
+        </div>
+        <label class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>
+          </svg>
+          <input class="search-input" id="search-input" type="search" placeholder="ابحث بالاسم أو رقم الهاتف..." autocomplete="off" aria-label="ابحث بالاسم أو رقم الهاتف">
+        </label>
+        <div class="contact-list" id="contact-list" aria-live="polite"></div>
+      </section>
+
+      <aside class="panel form-panel">
+        <div class="form-heading">
+          <h2>إضافة جهة جديدة</h2>
+          <p>أدخل بيانات جهة الاتصال لإضافتها إلى قائمتك.</p>
+        </div>
+        <form id="contact-form" novalidate>
+          <div class="form-field">
+            <label class="field-label" for="name-input">الاسم <span class="required" aria-hidden="true">*</span></label>
+            <input class="field-input" id="name-input" name="name" type="text" placeholder="مثال: سارة أحمد" autocomplete="name" maxlength="100" aria-describedby="name-error" required>
+            <p class="field-error" id="name-error" aria-live="polite"></p>
+          </div>
+          <div class="form-field">
+            <label class="field-label" for="phone-input">رقم الهاتف <span class="required" aria-hidden="true">*</span></label>
+            <input class="field-input" id="phone-input" name="phone" type="tel" placeholder="+966 50 123 4567" autocomplete="tel" inputmode="tel" dir="ltr" aria-describedby="phone-error" required>
+            <p class="field-error" id="phone-error" aria-live="polite"></p>
+          </div>
+          <div class="form-field">
+            <label class="field-label" for="email-input">البريد الإلكتروني <span class="optional">(اختياري)</span></label>
+            <input class="field-input" id="email-input" name="email" type="email" placeholder="name@example.com" autocomplete="email" dir="ltr" aria-describedby="email-error">
+            <p class="field-error" id="email-error" aria-live="polite"></p>
+          </div>
+          <button class="submit-button" type="submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            إضافة جهة الاتصال
+          </button>
+        </form>
+        <div class="form-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>
+          </svg>
+          <span>رقم الهاتف مطلوب، ولن تتم إضافة الرقم نفسه أكثر من مرة.</span>
+        </div>
+      </aside>
+    </div>
+    <p class="footer-note">دفتر جهاتي — بسيط، مرتب، وخاص بك.</p>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "arabic-contacts-app";
+      const form = document.getElementById("contact-form");
+      const nameInput = document.getElementById("name-input");
+      const phoneInput = document.getElementById("phone-input");
+      const emailInput = document.getElementById("email-input");
+      const searchInput = document.getElementById("search-input");
+      const contactList = document.getElementById("contact-list");
+      const contactCount = document.getElementById("contact-count");
+      const toast = document.getElementById("toast");
+      const collator = new Intl.Collator("ar", { sensitivity: "base" });
+      let contacts = loadContacts();
+      let toastTimer;
+
+      // تحميل جهات الاتصال المحفوظة مع التحقق من سلامة البيانات.
+      function loadContacts() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (!saved) return [];
+          const parsed = JSON.parse(saved);
+          if (!Array.isArray(parsed)) throw new Error("بيانات جهات الاتصال المحفوظة غير صالحة.");
+          return parsed.filter((contact) =>
+            contact &&
+            typeof contact.id === "string" &&
+            typeof contact.name === "string" &&
+            typeof contact.phone === "string" &&
+            typeof contact.email === "string"
+          );
+        } catch (error) {
+          window.setTimeout(() => showToast("تعذرت قراءة جهات الاتصال المحفوظة.", true), 0);
+          return [];
+        }
+      }
+
+      function saveContacts(nextContacts) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(nextContacts));
+          return true;
+        } catch (error) {
+          showToast("تعذر حفظ البيانات على هذا الجهاز. تحقق من مساحة التخزين.", true);
+          return false;
+        }
+      }
+
+      function normalizePhone(phone) {
+        return phone.replace(/[\s-]/g, "");
+      }
+
+      function setFieldError(input, message) {
+        const errorElement = document.getElementById(input.id.replace("-input", "-error"));
+        input.setAttribute("aria-invalid", message ? "true" : "false");
+        errorElement.textContent = message;
+      }
+
+      function clearErrors() {
+        [nameInput, phoneInput, emailInput].forEach((input) => setFieldError(input, ""));
+      }
+
+      function showToast(message, isError = false) {
+        window.clearTimeout(toastTimer);
+        toast.replaceChildren();
+        const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        icon.setAttribute("viewBox", "0 0 24 24");
+        icon.setAttribute("fill", "none");
+        icon.setAttribute("stroke", "currentColor");
+        icon.setAttribute("stroke-width", "2");
+        icon.setAttribute("stroke-linecap", "round");
+        icon.setAttribute("stroke-linejoin", "round");
+        icon.setAttribute("aria-hidden", "true");
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", isError ? "M18 6 6 18M6 6l12 12" : "m5 12 4 4L19 6");
+        icon.append(path);
+        const text = document.createElement("span");
+        text.textContent = message;
+        toast.append(icon, text);
+        toast.classList.toggle("is-error", isError);
+        toast.classList.add("is-visible");
+        toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 3000);
+      }
+
+      function makeSvg(pathData) {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("fill", "none");
+        svg.setAttribute("stroke", "currentColor");
+        svg.setAttribute("stroke-width", "1.8");
+        svg.setAttribute("stroke-linecap", "round");
+        svg.setAttribute("stroke-linejoin", "round");
+        svg.setAttribute("aria-hidden", "true");
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", pathData);
+        svg.append(path);
+        return svg;
+      }
+
+      function makeDetail(iconPath, value) {
+        const item = document.createElement("span");
+        item.className = "detail-item";
+        item.append(makeSvg(iconPath));
+        const text = document.createElement("span");
+        text.textContent = value;
+        item.append(text);
+        return item;
+      }
+
+      function makeEmptyState(hasSearch) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        const illustration = document.createElement("div");
+        illustration.className = "empty-illustration";
+        illustration.setAttribute("aria-hidden", "true");
+        illustration.append(makeSvg("M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6"));
+        const heading = document.createElement("h3");
+        heading.textContent = hasSearch ? "لا توجد نتائج" : "لا توجد جهات اتصال";
+        const description = document.createElement("p");
+        description.textContent = hasSearch
+          ? "لم نعثر على جهة اتصال تطابق بحثك. جرّب اسمًا أو رقمًا آخر."
+          : "قائمتك فارغة الآن. أضف أول جهة اتصال لتظهر هنا.";
+        empty.append(illustration, heading, description);
+        return empty;
+      }
+
+      function createContactCard(contact, index) {
+        const card = document.createElement("article");
+        card.className = "contact-card";
+        card.style.animationDelay = `${Math.min(index * 35, 210)}ms`;
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.setAttribute("aria-hidden", "true");
+        avatar.textContent = [...contact.name.trim()][0] || "؟";
+
+        const info = document.createElement("div");
+        info.className = "contact-info";
+        const name = document.createElement("h3");
+        name.className = "contact-name";
+        name.textContent = contact.name;
+        const details = document.createElement("div");
+        details.className = "contact-detail";
+        details.append(makeDetail("M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.84.58 2.8.7a2 2 0 0 1 1.72 2.04Z", contact.phone));
+        if (contact.email) details.append(makeDetail("M4 4h16v16H4zM22 6l-10 7L2 6", contact.email));
+        info.append(name, details);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete-button";
+        deleteButton.type = "button";
+        deleteButton.setAttribute("aria-label", `حذف جهة الاتصال ${contact.name}`);
+        deleteButton.append(makeSvg("M3 6h18M8 6V4h8v2m3 0-.9 14H5.9L5 6m4 4v6m6-6v6"));
+        const deleteText = document.createElement("span");
+        deleteText.textContent = "حذف";
+        deleteButton.append(deleteText);
+        deleteButton.addEventListener("click", () => removeContact(contact, card));
+
+        card.append(avatar, info, deleteButton);
+        return card;
+      }
+
+      // ترتيب جهات الاتصال أبجديًا وتطبيق البحث قبل عرض البطاقات.
+      function renderContacts() {
+        contactCount.textContent = String(contacts.length);
+        contactList.replaceChildren();
+        const query = searchInput.value.trim().toLocaleLowerCase("ar");
+        const filtered = contacts
+          .filter((contact) =>
+            contact.name.toLocaleLowerCase("ar").includes(query) ||
+            contact.phone.toLocaleLowerCase("ar").includes(query)
+          )
+          .sort((a, b) => collator.compare(a.name.trim(), b.name.trim()));
+
+        if (filtered.length === 0) {
+          contactList.append(makeEmptyState(Boolean(query)));
+          return;
+        }
+        filtered.forEach((contact, index) => contactList.append(createContactCard(contact, index)));
+      }
+
+      function removeContact(contact, card) {
+        if (!window.confirm(`هل أنت متأكد من حذف جهة الاتصال "${contact.name}"؟`)) return;
+        const nextContacts = contacts.filter((item) => item.id !== contact.id);
+        if (!saveContacts(nextContacts)) return;
+        card.classList.add("is-removing");
+        window.setTimeout(() => {
+          contacts = nextContacts;
+          renderContacts();
+          showToast("تم حذف جهة الاتصال.");
+        }, 190);
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        clearErrors();
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const email = emailInput.value.trim();
+        let isValid = true;
+
+        if (!name) {
+          setFieldError(nameInput, "يرجى إدخال الاسم.");
+          isValid = false;
+        }
+        if (!phone) {
+          setFieldError(phoneInput, "يرجى إدخال رقم الهاتف.");
+          isValid = false;
+        } else if (!/^\+?[\d\s-]+$/.test(phone) || !/\d/.test(phone)) {
+          setFieldError(phoneInput, "اكتب أرقامًا فقط، مع السماح بعلامة + والمسافات والشرطات.");
+          isValid = false;
+        }
+        if (email && !emailInput.validity.valid) {
+          setFieldError(emailInput, "يرجى إدخال بريد إلكتروني صحيح.");
+          isValid = false;
+        }
+        if (!isValid) return;
+
+        const canonicalPhone = normalizePhone(phone);
+        if (contacts.some((contact) => normalizePhone(contact.phone) === canonicalPhone)) {
+          setFieldError(phoneInput, "رقم الهاتف هذا مسجل مسبقًا.");
+          return;
+        }
+
+        const contact = {
+          id: window.crypto && typeof window.crypto.randomUUID === "function"
+            ? window.crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          name,
+          phone,
+          email
+        };
+        const nextContacts = [...contacts, contact];
+        if (!saveContacts(nextContacts)) return;
+        contacts = nextContacts;
+        form.reset();
+        clearErrors();
+        searchInput.value = "";
+        renderContacts();
+        showToast("تمت إضافة جهة الاتصال بنجاح.");
+        nameInput.focus();
+      });
+
+      [nameInput, phoneInput, emailInput].forEach((input) => {
+        input.addEventListener("input", () => {
+          if (input.getAttribute("aria-invalid") === "true") setFieldError(input, "");
+        });
+      });
+      searchInput.addEventListener("input", renderContacts);
+
+      // عرض القائمة المحفوظة عند فتح الصفحة.
+      renderContacts();
+    })();
+  </script>
+</body>
+</html>
